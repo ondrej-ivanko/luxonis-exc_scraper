@@ -15,11 +15,6 @@ PORT = 8000
 
 
 class SimpleAparmentHandler(SimpleHTTPRequestHandler):
-    def _set_response(self, code=200):
-        self.send_response(code)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-
     def close_sess(self, db_session):
         db_session.close()
         engine.dispose()
