@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  scraper:
+    build:
+      context: .
+    volumes:
+      - type: volume
+        source: project
+        target: /luxoris_sreality
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - HOST=scraper
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=sreality_apartments
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DISPLAY=scraper:0
+    ports:
+      - "8000:8000"
+
+  db:
+    image: postgres:15
+    volumes:
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sreality_apartments
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+
+volumes:
+  project:
+  postgres_data:
